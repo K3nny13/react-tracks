@@ -30,5 +30,47 @@ class CreateTrack(graphene.Mutation):
 		track.save()
 		return CreateTrack(track=track)
 		
+class UpdateTrack(graphene.Mutation):
+	track = graphene.Field(TrackType)
+	
+	class Arguments:
+		track_id = graphene.Int(required=True)
+		title = graphene.String()
+		description = graphene.String()
+		url = graphene.String()
+		
+	def mutate(self, info, track_id, title, url, description):
+		user = info.context.user
+		track = Track.objects.get(id=track_id)
+		
+		if track.posted_by != user:
+			raise Exception('Not your track to edit')
+			
+		track.title = title
+		track.description = description
+		track.url = url
+		
+		track.save()
+		
+		return UpdateTrack(track=track)
+		
+class DeleteTrack(graphene.Mutation):
+	track_id = graphene.Int()
+	
+	class Arguments:
+		track_id = graphene.Int(required=True)
+		
+	def mutate(self, info, track_id):
+		user = info.context.user
+		track = Track.object.get(id=track_id)
+		
+		if user != track.posted_by:
+			raise Exception('Not your track to delete')
+			
+		track.delete()
+		
+		return DeleteTrack(track_id=track_id)
+		
 class Mutation(graphene.ObjectType):
 	create_track = CreateTrack.Field()
+	update_track = UpdateTrack.Field()
