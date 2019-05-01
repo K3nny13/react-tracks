@@ -8,6 +8,9 @@ class Track(models.Model):
 	url = models.URLField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	posted_by = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.title + " - " + str(self.posted_by)
 	
 class Like(models.Model):
 	user = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
